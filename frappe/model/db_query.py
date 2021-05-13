@@ -564,6 +564,7 @@ class DatabaseQuery(object):
 		return condition
 
 	def build_match_conditions(self, as_condition=True):
+		print("Hello in build_match_conditions in db_query.py")
 		"""add match conditions if applicable"""
 		self.match_filters = []
 		self.match_conditions = []

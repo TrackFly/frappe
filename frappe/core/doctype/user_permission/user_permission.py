@@ -59,7 +59,7 @@ class UserPermission(Document):
 @frappe.whitelist(allow_guest=True)
 #def get_user_permissions(user=None, ptype="read"):
 def get_user_permissions(user=None):
-	print("hello in get_user_permissions")
+	print("hello in get_user_permissions in user_permission.py")
 	'''Get all users permissions for the user as a dict of doctype'''
 	# if this is called from client-side,
 	# user can access only his/her user permissions
