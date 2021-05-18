@@ -134,7 +134,6 @@ def get_doc_permissions(doc, user=None, ptype=None):
 		# eg. everyone might have read access but only owner can delete
 		permissions.update(permissions.get("if_owner", {}))
 
-	if not has_user_permission(doc, user):
 	if not has_user_permission(doc, user, ptype):
 		if is_user_owner():
 			# replace with owner permissions
