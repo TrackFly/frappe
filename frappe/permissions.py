@@ -206,7 +206,6 @@ def get_role_permissions(doctype_meta, user=None, is_owner=None):
 	return frappe.local.role_permissions[cache_key]
 
 def get_user_permissions(user):
-	print("hello in get_user_permissions in permissions.py")
 	from frappe.core.doctype.user_permission.user_permission import get_user_permissions
 	return get_user_permissions(user)
 
