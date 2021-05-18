@@ -57,7 +57,7 @@ class UserPermission(Document):
 			frappe.throw(_("{0} has already assigned default value for {1}.").format(ref_link, self.allow))
 
 @frappe.whitelist(allow_guest=True)
-def get_user_permissions(user=None):
+def get_user_permissions(user=None, ptype ='read'):
 	'''Get all users permissions for the user as a dict of doctype'''
 	# if this is called from client-side,
 	# user can access only his/her user permissions
@@ -70,14 +70,17 @@ def get_user_permissions(user=None):
 	if not user or user in ("Administrator", "Guest"):
 		return {}
 
-	cached_user_permissions = frappe.cache().hget("user_permissions", user)
+	if not ptype:
+		return {}
+
+	cached_user_permissions = frappe.cache().hget("user_permissions_" + ptype, user)
 
 	if cached_user_permissions is not None:
 		return cached_user_permissions
 
 	out = {}
 
-	def add_doc_to_perm(perm, doc_name, is_default):
+	def add_doc_to_perm(perm, doc_name, is_default, ptype):
 		# group rules for each type
 		# for example if allow is "Customer", then build all allowed customers
 		# in a list
@@ -87,21 +90,22 @@ def get_user_permissions(user=None):
 		out[perm.allow].append(frappe._dict({
 			'doc': doc_name,
 			'applicable_for': perm.get('applicable_for'),
-			'is_default': is_default
+			'is_default': is_default,
+			ptype: perm[ptype]
 		}))
 
 	try:
 		for perm in frappe.get_all('User Permission',
-			fields=['allow', 'for_value', 'applicable_for', 'is_default', 'hide_descendants'],
+			fields=['allow', 'for_value', 'applicable_for', 'is_default', 'hide_descendants', ptype],
 			filters=dict(user=user)):
 
 			meta = frappe.get_meta(perm.allow)
-			add_doc_to_perm(perm, perm.for_value, perm.is_default)
+			add_doc_to_perm(perm, perm.for_value, perm.is_default, ptype)
 
 			if meta.is_nested_set() and not perm.hide_descendants:
 				decendants = frappe.db.get_descendants(perm.allow, perm.for_value)
 				for doc in decendants:
-					add_doc_to_perm(perm, doc, False)
+					add_doc_to_perm(perm, doc, False, ptype)
 
 		out = frappe._dict(out)
 		frappe.cache().hset("user_permissions", user, out)

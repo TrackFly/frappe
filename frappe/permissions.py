@@ -135,6 +135,7 @@ def get_doc_permissions(doc, user=None, ptype=None):
 		permissions.update(permissions.get("if_owner", {}))
 
 	if not has_user_permission(doc, user):
+	if not has_user_permission(doc, user, ptype):
 		if is_user_owner():
 			# replace with owner permissions
 			permissions = permissions.get("if_owner", {})
@@ -209,10 +210,16 @@ def get_user_permissions(user):
 	from frappe.core.doctype.user_permission.user_permission import get_user_permissions
 	return get_user_permissions(user)
 
-def has_user_permission(doc, user=None):
+def get_allowed_docs_for_doctype_for_ptype(user_permissions, options, doctype, ptype):
+	user_perm_list = user_permissions.get(options, [])
+	filtered_user_perms = [user_perm for user_perm in user_perm_list if user_perm[ptype] != 0]
+	allowed_docs = get_allowed_docs_for_doctype(filtered_user_perms, doctype)
+	return allowed_docs
+	
+def has_user_permission(doc, user=None, ptype=None):
 	'''Returns True if User is allowed to view considering User Permissions'''
 	from frappe.core.doctype.user_permission.user_permission import get_user_permissions
-	user_permissions = get_user_permissions(user)
+	user_permissions = get_user_permissions(user, ptype)
 
 	if not user_permissions:
 		# no user permission rules specified for this doctype
@@ -230,8 +237,8 @@ def has_user_permission(doc, user=None):
 	# STEP 1: ---------------------
 	# check user permissions on self
 	if doctype in user_permissions:
-		allowed_docs = get_allowed_docs_for_doctype(user_permissions.get(doctype, []), doctype)
 
+		allowed_docs = get_allowed_docs_for_doctype_for_ptype(user_permissions, doctype, doctype, ptype)
 		# if allowed_docs is empty it states that there is no applicable permission under the current doctype
 
 		# only check if allowed_docs is not empty
@@ -265,7 +272,7 @@ def has_user_permission(doc, user=None):
 				continue
 
 			# get the list of all allowed values for this link
-			allowed_docs = get_allowed_docs_for_doctype(user_permissions.get(field.options, []), doctype)
+			allowed_docs = get_allowed_docs_for_doctype_for_ptype(user_permissions, field.options, doctype, ptype)
 
 			if allowed_docs and d.get(field.fieldname) not in allowed_docs:
 				# restricted for this link field, and no matching values found
