@@ -212,7 +212,6 @@ def get_user_permissions(user):
 def has_user_permission(doc, user=None):
 	'''Returns True if User is allowed to view considering User Permissions'''
 	from frappe.core.doctype.user_permission.user_permission import get_user_permissions
-	#user_permissions = get_user_permissions(user, ptype)
 	user_permissions = get_user_permissions(user)
 
 	if not user_permissions:
