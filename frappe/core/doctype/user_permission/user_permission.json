@@ -15,7 +15,11 @@
   "apply_to_all_doctypes",
   "applicable_for",
   "column_break_9",
-  "hide_descendants"
+  "hide_descendants",
+  "read",
+  "write",
+  "create",
+  "delete"
  ],
  "fields": [
   {
@@ -87,10 +91,34 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Hide Descendants"
+  },
+  {
+   "default": "0",
+   "fieldname": "read",
+   "fieldtype": "Check",
+   "label": "Read"
+  },
+  {
+   "default": "0",
+   "fieldname": "write",
+   "fieldtype": "Check",
+   "label": "Write"
+  },
+  {
+   "default": "0",
+   "fieldname": "create",
+   "fieldtype": "Check",
+   "label": "Create"
+  },
+  {
+   "default": "0",
+   "fieldname": "delete",
+   "fieldtype": "Check",
+   "label": "Delete"
   }
  ],
  "links": [],
- "modified": "2021-01-21 18:14:10.839381",
+ "modified": "2021-05-21 10:31:43.049819",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User Permission",
